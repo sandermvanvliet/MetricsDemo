@@ -52,7 +52,7 @@ services:
       context: ./src/Metrics.Demo.Cli
       dockerfile: Dockerfile
     environment:
-      APP_NAME: MetricsDemoCli-One
+      APP_NAME: MetricsDemoCli
       STATSD_SERVER: telegraf
     depends_on:
       - telegraf
@@ -62,7 +62,7 @@ services:
       context: ./src/Metrics.Demo.Cli
       dockerfile: Dockerfile
     environment:
-      APP_NAME: MetricsDemoCli-Two
+      APP_NAME: MetricsDemoCli
       STATSD_SERVER: telegraf
     depends_on:
       - telegraf
