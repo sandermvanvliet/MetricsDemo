@@ -47,12 +47,22 @@ services:
       - influxdb
       - telegraf
 
-  app:
+  app_one:
     build:
       context: ./src/Metrics.Demo.Cli
       dockerfile: Dockerfile
     environment:
-      APP_NAME: MetricsDemoCli
+      APP_NAME: MetricsDemoCli-One
+      STATSD_SERVER: telegraf
+    depends_on:
+      - telegraf
+
+  app_two:
+    build:
+      context: ./src/Metrics.Demo.Cli
+      dockerfile: Dockerfile
+    environment:
+      APP_NAME: MetricsDemoCli-Two
       STATSD_SERVER: telegraf
     depends_on:
       - telegraf
