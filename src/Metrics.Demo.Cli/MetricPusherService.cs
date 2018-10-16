@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DatadogSharp.DogStatsd;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using StatsdClient;
 
 namespace Metrics.Demo.Cli
 {
@@ -30,12 +30,18 @@ namespace Metrics.Demo.Cli
 
         private void PushMetrics()
         {
+            var random = new Random();
+
             while (!_tokenSource.Token.IsCancellationRequested)
             {
                 Thread.Sleep(1000);
 
-                logger.Information("Pushing metric");
-                DogStatsd.Increment("loop.count", tags: new[] { "foo:bar" });
+                var loopValue = random.Next(10, 100);
+
+                logger.Information("Pushing metric with loop value {loop_value}", loopValue);
+                
+                DatadogStats.Default.Increment("number_of_loops");
+                DatadogStats.Default.Gauge("loop_value", loopValue);
             }
 
             logger.Warning("Cancellation requested");

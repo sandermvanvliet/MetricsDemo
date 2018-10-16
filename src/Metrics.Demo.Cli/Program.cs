@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using StatsdClient;
 using Serilog;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog.Context;
+using DatadogSharp.DogStatsd;
+using System.Linq;
 
 namespace Metrics.Demo.Cli
 {
@@ -19,6 +21,8 @@ namespace Metrics.Demo.Cli
                 .CreateLogger();
 
             BootstrapStatsd(appName, logger);
+
+            LogContext.PushProperty("application", appName);
 
             logger.Information($"{appName} starting...");
 
@@ -40,16 +44,33 @@ namespace Metrics.Demo.Cli
                 serverName = "localhost";
             }
 
-            logger.Information("Configuring StatsD for server {serverName} and prefix {appName}", serverName, appName);
-
-            var dogstatsdConfig = new StatsdConfig
-            {
-                StatsdServerName = serverName,
-                StatsdPort = 8125, // Optional; default is 8125
-                Prefix = appName // Optional; by default no prefix will be prepended
+            var defaultTags = new [] {
+                "host:" + Environment.MachineName.ToLower()
             };
 
-            StatsdClient.DogStatsd.Configure(dogstatsdConfig);
+
+            var hostEntry = System.Net.Dns.GetHostEntry(serverName);
+            
+            foreach(var address in hostEntry.AddressList)
+            {
+                logger.Information("Found address {address}, {addr_v4}, {addr_v6}", address, address.MapToIPv4(), address.MapToIPv6());
+            }
+
+            var statsdServerAddress = hostEntry
+                .AddressList
+                .Where(addr => addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                .FirstOrDefault()
+                .MapToIPv4()
+                .ToString();
+
+            logger.Information("Configuring StatsD for server {server_name}({server_ip}) and prefix {application}", serverName, statsdServerAddress, appName);
+
+            DatadogStats.ConfigureDefault(
+                address: statsdServerAddress,
+                port: 8125,
+                metricNamePrefix: appName,
+                defaultTags: defaultTags
+            );
         }
     }
 }
