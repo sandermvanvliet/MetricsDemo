@@ -1,0 +1,48 @@
+version: '2'
+
+services:
+  influxdb:
+    image: influxdb
+    volumes:
+      - ./data/influxdb:/var/lib/influxdb
+      - ./config/influxdb.conf:/etc/influxdb/influxdb.conf
+    ports:
+      - "8086:8086"
+      - "8082:8082"
+      - "8089:8089"
+
+  telegraf:
+    image: telegraf
+    environment:
+      HOSTNAME: r2-dev-telegraf
+    volumes:
+      - ./config/telegraf.conf:/etc/telegraf/telegraf.conf
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - influxdb
+
+  kapacitor:
+    image: kapacitor
+    volumes:
+      - ./data/kapacitor:/var/lib/kapacitor
+      - ./config/kapacitor.conf:/etc/kapacitor/kapacitor.conf
+    depends_on:
+      - influxdb
+    ports:
+      - "9092:9092"
+
+  chronograf:
+    build:
+      context: ./chronograf
+      dockerfile: Dockerfile
+    image: jedlix/chronograf-dev/chronograf
+    environment:
+      RESOURCES_PATH: "/usr/share/chronograf/resources"
+    volumes:
+      - ./data/chronograf:/var/lib/chronograf
+    ports:
+      - "8888:8888"
+    depends_on:
+      - kapacitor
+      - influxdb
+      - telegraf

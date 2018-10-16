@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+[ -z "${DEBUG}" ] || set -x
+
+BASEDIR="$(dirname "$0")/.."
+cd "${BASEDIR}"
+
+if [ -f "Brewfile" ] && [ "$(uname -s)" = "Darwin" ]; then
+  echo "==> Installing project dependencies via homebrew..."
+  brew update
+  
+  brew bundle check >/dev/null 2>&1 || {
+    brew bundle
+  }
+fi

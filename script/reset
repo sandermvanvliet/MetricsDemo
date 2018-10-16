@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+[ -z "${DEBUG}" ] || set -x
+
+BASEDIR="$(dirname "$0")/.."
+cd ${BASEDIR}
+
+# This script is specific to this project, it is not part of STRTA
+echo "==> Resetting..."
+docker-compose down
+rm -rf data && mkdir data
+docker-compose build

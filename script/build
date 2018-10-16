@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+BASEDIR="$(dirname "$0")/.."
+cd "${BASEDIR}"
+
+echo "==> Building docker container..."
+
+docker-compose build
