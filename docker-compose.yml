@@ -46,3 +46,11 @@ services:
       - kapacitor
       - influxdb
       - telegraf
+
+  app:
+    build:
+      context: ./src/Metrics.Demo.Cli
+      dockerfile: Dockerfile
+    environment:
+      APP_NAME: MetricsDemoCli
+      STATSD_SERVER: telegraf
