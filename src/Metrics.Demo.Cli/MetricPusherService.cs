@@ -37,11 +37,12 @@ namespace Metrics.Demo.Cli
                 Thread.Sleep(1000);
 
                 var loopValue = random.Next(10, 100);
+                var tagValue = random.Next(1, 100) % 2 == 0 ? "red" : "blue";
 
                 logger.Information("Pushing metric with loop value {loop_value}", loopValue);
                 
                 DatadogStats.Default.Increment("number_of_loops");
-                DatadogStats.Default.Gauge("loop_value", loopValue);
+                DatadogStats.Default.Gauge("loop_value", loopValue, tags: new[] {"type:" + tagValue });
             }
 
             logger.Warning("Cancellation requested");
