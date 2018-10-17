@@ -68,3 +68,25 @@ services:
       ENVIRONMENT: development
     depends_on:
       - telegraf
+
+  app_three:
+    build:
+      context: ./src/Metrics.Demo.Cli
+      dockerfile: Dockerfile
+    environment:
+      APP_NAME: MetricsDemoCli
+      STATSD_SERVER: telegraf
+      ENVIRONMENT: testing
+    depends_on:
+      - telegraf
+
+  app_four:
+    build:
+      context: ./src/Metrics.Demo.Cli
+      dockerfile: Dockerfile
+    environment:
+      APP_NAME: MetricsDemoCli
+      STATSD_SERVER: telegraf
+      ENVIRONMENT: testing
+    depends_on:
+      - telegraf
