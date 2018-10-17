@@ -45,12 +45,18 @@ namespace Metrics.Demo.Cli
             var random = new Random();
             var loopValue = random.Next(10, 100);
             var tagValue = random.Next(1, 100) % 2 == 0 ? "red" : "blue";
+            
+            var tags = new [] { 
+                "type:" + tagValue,
+                "success:" + (random.Next(1, 100) % 2 == 0).ToString().ToLower()
+            };
 
             logger.Information("Pushing metric with loop value {loop_value}", loopValue);
             
             DatadogStats.Default.Increment("number_of_loops");
-            DatadogStats.Default.Gauge("loop_value", loopValue, tags: new[] {"type:" + tagValue });
-            DatadogStats.Default.Timer("other_api.get_data.duration", random.Next(250, 500), tags: new [] { "type:" + tagValue});
+            DatadogStats.Default.Gauge("loop_value", loopValue, tags: tags);
+            DatadogStats.Default.Timer("other_api.get_data.duration", random.Next(250, 500), tags: tags);
+            DatadogStats.Default.Timer("other_api.push_data.duration", random.Next(250, 500), tags: tags);
         }
     }
 }
