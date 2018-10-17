@@ -50,6 +50,7 @@ namespace Metrics.Demo.Cli
             
             DatadogStats.Default.Increment("number_of_loops");
             DatadogStats.Default.Gauge("loop_value", loopValue, tags: new[] {"type:" + tagValue });
+            DatadogStats.Default.Timer("other_api.get_data.duration", random.Next(250, 500), tags: new [] { "type:" + tagValue});
         }
     }
 }
