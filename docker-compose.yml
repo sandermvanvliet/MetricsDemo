@@ -54,6 +54,7 @@ services:
     environment:
       APP_NAME: MetricsDemoCli
       STATSD_SERVER: telegraf
+      ENVIRONMENT: development
     depends_on:
       - telegraf
 
@@ -64,5 +65,6 @@ services:
     environment:
       APP_NAME: MetricsDemoCli
       STATSD_SERVER: telegraf
+      ENVIRONMENT: development
     depends_on:
       - telegraf
