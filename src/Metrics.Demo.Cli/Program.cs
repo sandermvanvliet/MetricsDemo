@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog.Context;
 using DatadogSharp.DogStatsd;
 using System.Linq;
+using System.Net;
 
 namespace Metrics.Demo.Cli
 {
@@ -45,15 +46,36 @@ namespace Metrics.Demo.Cli
             }
 
             var defaultTags = new [] {
-                "host:" + Environment.MachineName.ToLower()
+                "host:" + Environment.MachineName.ToLower(),
+                "environment:" + Environment.GetEnvironmentVariable("ENVIRONMENT")
             };
 
+            IPHostEntry hostEntry = null;
+            var retryCount = 3;
 
-            var hostEntry = System.Net.Dns.GetHostEntry(serverName);
-            
-            foreach(var address in hostEntry.AddressList)
+            while(retryCount-- > 0)
             {
-                logger.Information("Found address {address}, {addr_v4}, {addr_v6}", address, address.MapToIPv4(), address.MapToIPv6());
+                try
+                {
+                    hostEntry = System.Net.Dns.GetHostEntry(serverName);
+                    
+                    foreach(var address in hostEntry.AddressList)
+                    {
+                        logger.Information("Found address {address}, {addr_v4}, {addr_v6}", address, address.MapToIPv4(), address.MapToIPv6());
+                    }
+
+                    break;
+                }
+                catch(Exception ex)
+                {
+                    logger.Warning(ex, "Failed to resolve {server_name}", serverName);
+                    Thread.Sleep(1000);
+                }
+            }
+            if(retryCount <= 0)
+            {
+                logger.Error("Unable to resolve address of {server_name}", serverName);
+                Environment.Exit(1);
             }
 
             var statsdServerAddress = hostEntry
