@@ -14,7 +14,7 @@ services:
   telegraf:
     image: telegraf
     environment:
-      HOSTNAME: r2-dev-telegraf
+      HOSTNAME: telegraf
     volumes:
       - ./config/telegraf.conf:/etc/telegraf/telegraf.conf
       - /var/run/docker.sock:/var/run/docker.sock
