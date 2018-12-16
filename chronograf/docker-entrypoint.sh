@@ -2,6 +2,8 @@
 
 set -e
 
+echo `which wget`
+
 until wget http://influxdb:8086/ping; do
   echo "InfluxDB is unavailable - sleeping for 5 seconds"
   sleep 5
